@@ -94,28 +94,36 @@ namespace CountColor
         //24bitだけ対応、bool型の配列で色の有無だけ確認、速い
         private int Count24bit(byte[] pixels)
         {
-            bool[] colorInt = new bool[256 * 256 * 256];
+            bool[] bColor = new bool[256 * 256 * 256];
+            //RGBをintに変換して、そのインデックスの値をTrueにする
             for (int i = 0; i < pixels.Length; i += 4)
             {
-                colorInt[pixels[i] | (pixels[i + 1] << 8) | (pixels[i + 2] << 16)] = true;//bgr
+                bColor[pixels[i] | (pixels[i + 1] << 8) | (pixels[i + 2] << 16)] = true;//bgr
             }
+            //Trueの数をカウント
             int count = 0;
-            for (int i = 0; i < colorInt.Length; i++)
+            for (int i = 0; i < bColor.Length; i++)
             {
-                if (colorInt[i] == true) { count++; }
+                if (bColor[i] == true) { count++; }
             }
+
+            //LINQでTrueの数をカウント、↑より1～2割遅い
+            //int neko = bColor.Where(saru => saru == true).Count();
+            //Whereは省略してcountメソッドだけでもカウントできるけど、もっと遅い
+            //int inu = bColor.Count(saru => saru);
             return count;
         }
 
         //32bit、色数と各色カウント
         private Dictionary<uint, int> Count32bit(byte[] pixels)
         {
+            //Keyには色のインデックス、Valueはカウント数
             var table = new Dictionary<uint, int>();//uint
             uint key;
             for (int i = 0; i < pixels.Length; i += 4)
             {
                 key = (uint)(pixels[i] | (pixels[i + 1] << 8) | (pixels[i + 2] << 16) | (pixels[i + 3] << 24));
-                //はじめての色ならValueを1
+                //はじめての色なら要素を追加、Valueは1
                 if (table.ContainsKey(key) == false) { table.Add(key, 1); }
                 //2回目以降はValueに1を足していく
                 else { table[key] = table[key] + 1; }//value += 1
