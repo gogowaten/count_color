@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test幅を比率で2", "test幅を比率で2\test幅を比率で2.csproj", "{57C21CE1-3A96-4910-AEE9-D094AF3BE533}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{57C21CE1-3A96-4910-AEE9-D094AF3BE533}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57C21CE1-3A96-4910-AEE9-D094AF3BE533}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57C21CE1-3A96-4910-AEE9-D094AF3BE533}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57C21CE1-3A96-4910-AEE9-D094AF3BE533}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {940CBDC9-D79E-49FA-BC02-4152C2B2A5FB}
+	EndGlobalSection
+EndGlobal

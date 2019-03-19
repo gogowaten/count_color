@@ -21,7 +21,7 @@
           <DataTemplate>
             <StackPanel Orientation="Horizontal">              
               <TextBlock Text="{Binding Count}" Width="50" TextAlignment="Right" Margin="0,0,4,0"/>
-              <Border Background="{Binding Brush}" Width="{Binding Count}" Height="10"/>
+              <Border Background="{Binding Brush}" Width="{Binding Count}" Height="10"/>              
             </StackPanel>
           </DataTemplate>
         </ListBox.ItemTemplate>
