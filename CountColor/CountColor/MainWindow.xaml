@@ -6,6 +6,9 @@
         xmlns:local="clr-namespace:CountColor"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+  <Window.Resources>
+    <local:MyMultiConverter x:Key="myMultiConv"/>
+  </Window.Resources>
   <Grid Margin="10,30,10,0">
     <Grid.RowDefinitions>
       <RowDefinition Height="300"/>
@@ -21,7 +24,14 @@
           <DataTemplate>
             <StackPanel Orientation="Horizontal">              
               <TextBlock Text="{Binding Count}" Width="50" TextAlignment="Right" Margin="0,0,4,0"/>
-              <Border Background="{Binding Brush}" Width="{Binding Count}" Height="10"/>              
+              <Border Background="{Binding Brush}" Height="10">
+                <Border.Width>
+                  <MultiBinding Converter="{StaticResource myMultiConv}">
+                    <Binding ElementName="MyListBox" Path="ActualWidth"/>
+                    <Binding Path="Rate"/>
+                  </MultiBinding>
+                </Border.Width>
+              </Border>
             </StackPanel>
           </DataTemplate>
         </ListBox.ItemTemplate>

@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace CountColor
 {
@@ -49,8 +50,8 @@ namespace CountColor
             //下位10色
             IEnumerable<KeyValuePair<uint, int>> bottom = sorted.Skip(sorted.Count() - 10);
             //KeyValuePair<uint, int>[] neko = top.ToArray();
-
-            MyData = new MyColorCountData(top);
+            var maxValue = top.Max(x => x.Value);
+            MyData = new MyColorCountData(top, maxValue);
             //MyData = new ObservableCollection<MyStruct>();
             //MyData = new ObservableCollection<MyColor>();
             foreach (var item in top)
@@ -182,21 +183,21 @@ namespace CountColor
     public class MyColor
     {
         public int Count { get; set; }
-        public uint Value { get; set; }
+        public double Rate { get; set; }
         public Color Color { get; set; }
         public SolidColorBrush Brush { get; set; }
     }
 
-    public struct MyStruct
-    {
-        public Color Color;
-        public int Count;
+    //public struct MyStruct
+    //{
+    //    public Color Color;
+    //    public int Count;
 
-    }
+    //}
     public class MyColorCountData
     {
         public ObservableCollection<MyColor> data { get; set; }
-        public MyColorCountData(IEnumerable<KeyValuePair<uint, int>> keyValues)
+        public MyColorCountData(IEnumerable<KeyValuePair<uint, int>> keyValues, double maxValue)
         {
             data = new ObservableCollection<MyColor>();
             foreach (var item in keyValues)
@@ -207,8 +208,22 @@ namespace CountColor
                 byte r = (byte)(ui >> 16 & 0x00FF);
                 byte a = (byte)(ui >> 24);
                 Color c = Color.FromArgb(a, r, g, b);
-                data.Add(new MyColor() { Color = c, Count = item.Value, Brush = new SolidColorBrush(c) });
+                double rate = item.Value / maxValue;
+                data.Add(new MyColor() { Color = c, Count = item.Value, Brush = new SolidColorBrush(c), Rate = rate });
             }
+        }
+    }
+
+    public class MyMultiConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((double)values[0] * (double)values[1]) - 80;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }
