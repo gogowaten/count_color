@@ -24,7 +24,11 @@ namespace CountColor
     {
         byte[] MyImageByte;
         BitmapSource MyBitmapSource;
+        int MyBitmapPixelsCount;
         MyColorCountData MyData;
+        Dictionary<uint, int> MyTable;
+        IOrderedEnumerable<KeyValuePair<uint, int>> MySortedTable;
+
         //ObservableCollection<MyStruct> MyData;
         //ObservableCollection<MyColor> MyData;
         public MainWindow()
@@ -33,17 +37,40 @@ namespace CountColor
 
             this.AllowDrop = true;
             Drop += MainWindow_Drop;
-            Button1.Click += Button1_Click;
+            MyTable = new Dictionary<uint, int>();
 
+            Button1.Click += Button1_Click;
+            ButtonTest1.Click += ButtonTest1_Click;
+            MyListBox.SelectionChanged += MyListBox_SelectionChanged;
+        }
+
+        private void MyListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var sis = MyListBox.SelectedItems;
+            var si = MyListBox.SelectedItem;
+            var sv = MyListBox.SelectedValue;
+            var sin = MyListBox.SelectedIndex;
+
+
+        }
+
+        private void ButtonTest1_Click(object sender, RoutedEventArgs e)
+        {
+            var low = MySortedTable.Skip(MySortedTable.Count() - 10);
+            var max = low.Max(x => x.Value);
+            var dd = new MyColorCountData(low, max, MyBitmapPixelsCount);
+            DataContext = dd.data;
+            //MyData.data[0].Color = Colors.Red;
         }
 
         private void Button1_Click(object sender, RoutedEventArgs e)
         {
             if (MyImageByte is null) { return; }
-            Dictionary<uint, int> table = Count32bit(MyImageByte);
-            TextBlock2.Text = $"使用色数{table.Count:#,0}(32bit)";
+            MyTable = Count32bit(MyImageByte);
+            TextBlock2.Text = $"使用色数{MyTable.Count:#,0}(32bit)";
             //降順でソート
-            IOrderedEnumerable<KeyValuePair<uint, int>> sorted = table.OrderByDescending((data) => data.Value);
+            IOrderedEnumerable<KeyValuePair<uint, int>> sorted = MyTable.OrderByDescending((data) => data.Value);
+            MySortedTable = sorted;
             //上位10色
             //MyData = sorted.Take(10);
             IEnumerable<KeyValuePair<uint, int>> top = sorted.Take(10);
@@ -51,14 +78,7 @@ namespace CountColor
             IEnumerable<KeyValuePair<uint, int>> bottom = sorted.Skip(sorted.Count() - 10);
             //KeyValuePair<uint, int>[] neko = top.ToArray();
             var maxValue = top.Max(x => x.Value);
-            MyData = new MyColorCountData(top, maxValue);
-            //MyData = new ObservableCollection<MyStruct>();
-            //MyData = new ObservableCollection<MyColor>();
-            foreach (var item in top)
-            {
-                //MyData.Add(new MyStruct() { Color = Colors.Red, Count = item.Value });
-                //MyData.Add(new MyColor { Count = item.Value, Value = item.Key });
-            }
+            MyData = new MyColorCountData(top, maxValue, MyBitmapPixelsCount);
 
             DataContext = MyData.data;
         }
@@ -83,6 +103,13 @@ namespace CountColor
 
                 TextBlock2.Text = "";
                 DataContext = null;
+
+                int pw = MyBitmapSource.PixelWidth;
+                int ph = MyBitmapSource.PixelHeight;
+                MyBitmapPixelsCount = pw * ph;
+                TextBlockPixelsCount.Text = $"{pw} x {ph} = {MyBitmapPixelsCount:#,0} Pixels";
+
+
             }
 
         }
@@ -183,21 +210,27 @@ namespace CountColor
     public class MyColor
     {
         public int Count { get; set; }
-        public double Rate { get; set; }
+        public double Rate { get; set; }//最多ピクセルからみた割合
+        public double Rate2 { get; set; }//総ピクセル数からみた割合
         public Color Color { get; set; }
         public SolidColorBrush Brush { get; set; }
+
+        public MyColor(int count, double rate, double rate2, Color color, SolidColorBrush brush)
+        {
+            Count = count;
+            Rate = rate;
+            Rate2 = rate2;
+            Color = color;
+            Brush = brush;
+        }
     }
 
-    //public struct MyStruct
-    //{
-    //    public Color Color;
-    //    public int Count;
 
-    //}
     public class MyColorCountData
     {
         public ObservableCollection<MyColor> data { get; set; }
-        public MyColorCountData(IEnumerable<KeyValuePair<uint, int>> keyValues, double maxValue)
+
+        public MyColorCountData(IEnumerable<KeyValuePair<uint, int>> keyValues, double maxValue, double pixelsCount)
         {
             data = new ObservableCollection<MyColor>();
             foreach (var item in keyValues)
@@ -209,7 +242,9 @@ namespace CountColor
                 byte a = (byte)(ui >> 24);
                 Color c = Color.FromArgb(a, r, g, b);
                 double rate = item.Value / maxValue;
-                data.Add(new MyColor() { Color = c, Count = item.Value, Brush = new SolidColorBrush(c), Rate = rate });
+                double rate2 = item.Value / pixelsCount;
+                //data.Add(new MyColor() { Color = c, Count = item.Value, Brush = new SolidColorBrush(c), Rate = rate });
+                data.Add(new MyColor(item.Value, rate, rate2, c, new SolidColorBrush(c)));
             }
         }
     }
@@ -226,6 +261,21 @@ namespace CountColor
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class MyConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Color c = (Color)value;
+            string rgb = $"ARGB = ({c.A}, {c.R}, {c.G}, {c.B})";
+            return rgb;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
