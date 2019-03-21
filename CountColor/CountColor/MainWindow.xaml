@@ -17,12 +17,14 @@
     <StackPanel Grid.Row="0">
       <Button Name="Button1" Content="カウント開始"/>
       <TextBlock Name="TextBlock1" Text="text1" FontSize="16"/>
-      <TextBlock Name="TextBlock2" Text="text2" FontSize="16"/>      
-      
+      <TextBlock Name="TextBlock2" Text="text2" FontSize="16"/>
+
       <ListBox Name="MyListBox" ItemsSource="{Binding}">
         <ListBox.ItemTemplate>
           <DataTemplate>
-            <StackPanel Orientation="Horizontal">              
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding Rate, StringFormat=000.0%}" Width="50"/>
+              <Border Background="{Binding Brush}" Width="20"/>
               <TextBlock Text="{Binding Count}" Width="50" TextAlignment="Right" Margin="0,0,4,0"/>
               <Border Background="{Binding Brush}" Height="10">
                 <Border.Width>

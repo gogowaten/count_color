@@ -218,7 +218,11 @@ namespace CountColor
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((double)values[0] * (double)values[1]) - 80;
+            //double width = ((double)values[0] * (double)values[1]);
+            //width = (width - 80 < 0) ? 1 : width - 80;
+
+            double width = ((double)values[0] - 140) * (double)values[1];
+            return width;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
