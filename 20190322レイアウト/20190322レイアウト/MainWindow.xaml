@@ -1,0 +1,32 @@
+﻿<Window x:Class="_20190322レイアウト.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_20190322レイアウト"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="3*"/>
+      <ColumnDefinition Width="5*"/>
+    </Grid.ColumnDefinitions>
+    <DockPanel Grid.Column="0">
+      <StatusBar DockPanel.Dock="top">
+        <TextBlock Text="status textblock"/>
+      </StatusBar>
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <Image Name="MyImage" Stretch="None" UseLayoutRounding="True"/>
+      </ScrollViewer>
+    </DockPanel>
+    <DockPanel Grid.Column="1" Opacity="1.0">
+      <StackPanel DockPanel.Dock="Top">
+        <Button Content="button1"/>
+        <Button Content="button1"/>
+      </StackPanel>
+      <ListBox DockPanel.Dock="Top" Name="MyListBox" ItemsSource="{Binding}">
+        
+      </ListBox>
+    </DockPanel>
+  </Grid>
+</Window>

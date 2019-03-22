@@ -57,7 +57,7 @@ namespace CountColor
             var low = MySortedTable.Skip(MySortedTable.Count() - 10);
             var max = low.Max(x => x.Value);
             var dd = new MyColorCountData(low, max, MyBitmapPixelsCount);
-            DataContext = dd.data;
+            DataContext = dd.Data;
             //MyData.data[0].Color = Colors.Red;
         }
 
@@ -71,14 +71,14 @@ namespace CountColor
             MySortedTable = sorted;
             //上位10色
             //MyData = sorted.Take(10);
-            IEnumerable<KeyValuePair<uint, int>> top = sorted.Take(10);
+            IEnumerable<KeyValuePair<uint, int>> top = sorted.Take(128);
             //下位10色
             IEnumerable<KeyValuePair<uint, int>> bottom = sorted.Skip(sorted.Count() - 10);
             //KeyValuePair<uint, int>[] neko = top.ToArray();
             var maxValue = top.Max(x => x.Value);
             MyData = new MyColorCountData(top, maxValue, MyBitmapPixelsCount);
 
-            DataContext = MyData.data;
+            DataContext = MyData.Data;
         }
 
         private void MainWindow_Drop(object sender, DragEventArgs e)
@@ -226,23 +226,23 @@ namespace CountColor
 
     public class MyColorCountData
     {
-        public ObservableCollection<MyColor> data { get; set; }
+        public ObservableCollection<MyColor> Data { get; set; }
 
         public MyColorCountData(IEnumerable<KeyValuePair<uint, int>> keyValues, double maxValue, double pixelsCount)
         {
-            data = new ObservableCollection<MyColor>();
+            Data = new ObservableCollection<MyColor>();
             foreach (var item in keyValues)
             {
                 uint ui = item.Key;
                 byte b = (byte)(ui & 0x000000FF);
-                byte g = (byte)(ui >> 8 & 0x0000FF);
-                byte r = (byte)(ui >> 16 & 0x00FF);
+                byte g = (byte)((ui >> 8) & 0x0000FF);
+                byte r = (byte)((ui >> 16) & 0x00FF);
                 byte a = (byte)(ui >> 24);
                 Color c = Color.FromArgb(a, r, g, b);
                 double rate = item.Value / maxValue;
                 double rate2 = item.Value / pixelsCount;
                 //data.Add(new MyColor() { Color = c, Count = item.Value, Brush = new SolidColorBrush(c), Rate = rate });
-                data.Add(new MyColor(item.Value, rate, rate2, c, new SolidColorBrush(c)));
+                Data.Add(new MyColor(item.Value, rate, rate2, c, new SolidColorBrush(c)));
             }
         }
     }
@@ -251,7 +251,7 @@ namespace CountColor
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            double width = ((double)values[0] - 140) * (double)values[1];
+            double width = ((double)values[0] - 160) * (double)values[1];
             return width;
         }
 

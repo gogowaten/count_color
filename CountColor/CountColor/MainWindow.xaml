@@ -11,46 +11,60 @@
     <local:MyConverter x:Key="myColorToRGB"/>
   </Window.Resources>
   <Grid Margin="10,30,10,0">
-    <Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="3*"/>
+      <ColumnDefinition Width="5*"/>
+    </Grid.ColumnDefinitions>
+    <!--<Grid.RowDefinitions>
       <RowDefinition Height="300"/>
       <RowDefinition/>
-    </Grid.RowDefinitions>
-    <StackPanel Grid.Row="0">      
-      <Button Name="Button1" Content="計算実行"/>
-      <TextBlock Name="TextBlock1" Text="text1" FontSize="16"/>
-      <TextBlock Name="TextBlock2" Text="text2" FontSize="16"/>
+    </Grid.RowDefinitions>-->
+    <DockPanel Grid.Row="0">
+      <Button DockPanel.Dock="Top" Name="Button1" Content="計算実行"/>
+      <TextBlock DockPanel.Dock="Top" Name="TextBlock1" Text="text1" FontSize="16"/>
+      <TextBlock DockPanel.Dock="Top" Name="TextBlock2" Text="text2" FontSize="16"/>
+      <TextBlock DockPanel.Dock="Top" Name="TextBlockPixelsCount"/>
+      <StackPanel DockPanel.Dock="top" Orientation="Horizontal" UseLayoutRounding="True">
+        <Border DockPanel.Dock="top" Width="20" Height="100" Background="{Binding ElementName=MyListBox, Path=SelectedItem.Brush}"/>
+        <StackPanel>
+          <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color}"/>
+          <TextBlock Margin="4,0" DockPanel.Dock="Top" Width="200" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color, Converter={StaticResource myColorToRGB}}"/>
+          <TextBlock Margin="4,0" Text="HSV"/>
+          <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Count, StringFormat=# pixels}"/>
+          <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Rate2, StringFormat=0.00%}"/>
+          <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedIndex}"/>
+        </StackPanel>
+      </StackPanel>
+      <StackPanel DockPanel.Dock="Top">
+      </StackPanel>
 
-      <StatusBar>
-        <Border Width="20" Height="10" Background="{Binding ElementName=MyListBox, Path=SelectedItem.Brush}"/>
-        <TextBlock Width="70" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color}"/>
-        <TextBlock Width="200" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color, Converter={StaticResource myColorToRGB}}"/>
-        <TextBlock Text="{Binding ElementName=MyListBox, Path=SelectedItem.Rate2, StringFormat=0.00%}"/>
+      <StatusBar DockPanel.Dock="Top">
         <Separator/>
-        <TextBlock Name="TextBlockPixelsCount"/>
         <Button Name="ButtonTest1" Content="test"/>
       </StatusBar>
-      <ListBox Name="MyListBox" ItemsSource="{Binding}">
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="{Binding Rate, StringFormat=000.0%}" Width="50"/>
-              <Border Background="{Binding Brush}" Width="20"/>
-              <TextBlock Text="{Binding Count}" Width="50" TextAlignment="Right" Margin="0,0,4,0"/>
-              <Border Background="{Binding Brush}" Height="10">
-                <Border.Width>
-                  <MultiBinding Converter="{StaticResource myMultiConv}">
-                    <Binding ElementName="MyListBox" Path="ActualWidth"/>
-                    <Binding Path="Rate"/>
-                  </MultiBinding>
-                </Border.Width>
-              </Border>
-            </StackPanel>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-    </StackPanel>
-    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-      <Image Name="MyImage" UseLayoutRounding="True" Stretch="None"/>
-    </ScrollViewer>
+
+      <ScrollViewer Grid.Row="0" DockPanel.Dock="Top" UseLayoutRounding="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Image Name="MyImage" Stretch="None"/>
+      </ScrollViewer>
+    </DockPanel>
+    <ListBox Grid.Column="1" DockPanel.Dock="Top" Name="MyListBox" ItemsSource="{Binding}">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Rate, StringFormat=000.0%}" Width="50"/>
+            <Border Background="{Binding Brush}" Width="20"/>
+            <TextBlock Text="{Binding Count}" Width="50" TextAlignment="Right" Margin="0,0,4,0"/>
+            <Border Background="{Binding Brush}" Height="10">
+              <Border.Width>
+                <MultiBinding Converter="{StaticResource myMultiConv}">
+                  <Binding ElementName="MyListBox" Path="ActualWidth"/>
+                  <Binding Path="Rate"/>
+                </MultiBinding>
+              </Border.Width>
+            </Border>
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
   </Grid>
 </Window>
