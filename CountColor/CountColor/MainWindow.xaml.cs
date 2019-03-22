@@ -29,8 +29,6 @@ namespace CountColor
         Dictionary<uint, int> MyTable;
         IOrderedEnumerable<KeyValuePair<uint, int>> MySortedTable;
 
-        //ObservableCollection<MyStruct> MyData;
-        //ObservableCollection<MyColor> MyData;
         public MainWindow()
         {
             InitializeComponent();
@@ -40,7 +38,7 @@ namespace CountColor
             MyTable = new Dictionary<uint, int>();
 
             Button1.Click += Button1_Click;
-            ButtonTest1.Click += ButtonTest1_Click;
+            //ButtonTest1.Click += ButtonTest1_Click;
             MyListBox.SelectionChanged += MyListBox_SelectionChanged;
         }
 
@@ -253,9 +251,6 @@ namespace CountColor
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            //double width = ((double)values[0] * (double)values[1]);
-            //width = (width - 80 < 0) ? 1 : width - 80;
-
             double width = ((double)values[0] - 140) * (double)values[1];
             return width;
         }
