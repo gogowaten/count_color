@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using MyHSV;//HSV.dllを参照に追加
 
 namespace CountColor
 {
@@ -268,6 +269,21 @@ namespace CountColor
             Color c = (Color)value;
             string rgb = $"ARGB = ({c.A}, {c.R}, {c.G}, {c.B})";
             return rgb;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class MyConverterColorToHSV : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Color c = (Color)value;
+            HSV hSV = HSV.Color2HSV(c);
+            return $"HSV = {hSV.ToString100()}";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

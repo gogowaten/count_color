@@ -9,6 +9,7 @@
   <Window.Resources>
     <local:MyMultiConverter x:Key="myMultiConv"/>
     <local:MyConverter x:Key="myColorToRGB"/>
+    <local:MyConverterColorToHSV x:Key="myColorToHSV"/>
   </Window.Resources>
   <Grid Margin="0,10,0,0">
     <Grid.ColumnDefinitions>
@@ -21,15 +22,15 @@
     </Grid.RowDefinitions>-->
     <DockPanel Grid.Row="0">
       <Button DockPanel.Dock="Top" Name="Button1" Content="計算実行"/>
-      <TextBlock DockPanel.Dock="Top" Name="TextBlock1" Text="text1" FontSize="16"/>
-      <TextBlock DockPanel.Dock="Top" Name="TextBlock2" Text="text2" FontSize="16"/>
-      <TextBlock DockPanel.Dock="Top" Name="TextBlockPixelsCount"/>
+      <TextBlock DockPanel.Dock="Top" Name="TextBlock1" Text="text1" FontSize="16" Margin="4,0"/>
+      <TextBlock DockPanel.Dock="Top" Name="TextBlock2" Text="text2" FontSize="16" Margin="4,0"/>
+      <TextBlock DockPanel.Dock="Top" Name="TextBlockPixelsCount" Margin="4,0"/>
       <StackPanel DockPanel.Dock="top" Margin="4" Orientation="Horizontal" UseLayoutRounding="True">
         <Border DockPanel.Dock="top" Width="20" Height="auto" Background="{Binding ElementName=MyListBox, Path=SelectedItem.Brush}"/>
         <StackPanel>
           <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color}"/>
-          <TextBlock Margin="4,0" DockPanel.Dock="Top" Width="200" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color, Converter={StaticResource myColorToRGB}}"/>
-          <TextBlock Margin="4,0" Text="HSV"/>
+          <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color, Converter={StaticResource myColorToRGB}}"/>
+          <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color, Converter={StaticResource myColorToHSV}}"/>
           <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Count, StringFormat=# pixels}"/>
           <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Rate2, StringFormat=0.00%}"/>
           <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedIndex}"/>
