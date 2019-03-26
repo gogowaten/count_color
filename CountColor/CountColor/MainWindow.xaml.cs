@@ -26,9 +26,9 @@ namespace CountColor
         byte[] MyImageByte;
         BitmapSource MyBitmapSource;
         int MyBitmapPixelsCount;
-        MyColorCountData MyData;
+        MyColorCountData MyDataDescend;
+        MyColorCountData MyDataAscend;
         Dictionary<uint, int> MyTable;
-        IOrderedEnumerable<KeyValuePair<uint, int>> MySortedTable;
 
         public MainWindow()
         {
@@ -39,8 +39,64 @@ namespace CountColor
             MyTable = new Dictionary<uint, int>();
 
             Button1.Click += Button1_Click;
-            //ButtonTest1.Click += ButtonTest1_Click;
+            ButtonTest1.Click += ButtonTest1_Click;
             MyListBox.SelectionChanged += MyListBox_SelectionChanged;
+            MyToggleSort.Click += MyToggleSort_Click;            
+            ButtonBGColor.Click += ButtonBGColor_Click;
+            ButtonImageStretch.Click += ButtonImageStretch_Click;
+        }
+
+        private void ButtonImageStretch_Click(object sender, RoutedEventArgs e)
+        {
+            if (MyImageByte is null) { return; }
+            if (MyScrollViewer.Content == null)
+            {
+                MyDockPanel.Children.Remove(MyImage);
+                MyScrollViewer.Content = MyImage;
+            }
+            else
+            {
+                MyScrollViewer.Content = null;
+                MyDockPanel.Children.Add(MyImage);
+            }
+
+        }
+
+        private void ButtonBGColor_Click(object sender, RoutedEventArgs e)
+        {
+            Brush bgColor = MyListBox.Background;
+            Brush black = Brushes.Black;
+            Brush white = Brushes.White;
+            Brush gray = Brushes.Gray;
+            if (bgColor == black)
+            {
+                MyListBox.Background = white;
+                MyListBox.Foreground = black;
+            }
+            else if (bgColor == gray)
+            {
+                MyListBox.Background = black;
+                MyListBox.Foreground = white;
+            }
+            else
+            {
+                MyListBox.Background = gray;
+            }
+        }
+
+      
+
+        private void MyToggleSort_Click(object sender, RoutedEventArgs e)
+        {
+            if (MyTable is null) { return; }
+            if (MyToggleSort.IsChecked == false)
+            {
+                DataContext = MyDataDescend.Data;
+            }
+            else
+            {
+                DataContext = MyDataAscend.Data;
+            }
         }
 
         private void MyListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -55,31 +111,31 @@ namespace CountColor
 
         private void ButtonTest1_Click(object sender, RoutedEventArgs e)
         {
-            var low = MySortedTable.Skip(MySortedTable.Count() - 10);
-            var max = low.Max(x => x.Value);
-            var dd = new MyColorCountData(low, max, MyBitmapPixelsCount);
-            DataContext = dd.Data;
-            //MyData.data[0].Color = Colors.Red;
+            if (MyDataAscend is null) { return; }
+            //var low = MyDescendSorteTable.Skip(MyDescendSorteTable.Count() - 10);
+            //var max = low.Max(x => x.Value);
+            //var dd = new MyColorCountData(low, max, MyBitmapPixelsCount);
+            //DataContext = dd.Data;
+            //MyDataAscend.Data[0].Color = Colors.Red;
         }
 
         private void Button1_Click(object sender, RoutedEventArgs e)
         {
             if (MyImageByte is null) { return; }
+            MyToggleSort.IsEnabled = true;
             MyTable = Count32bit(MyImageByte);
             TextBlock2.Text = $"使用色数{MyTable.Count:#,0}(32bit)";
             //降順でソート
-            IOrderedEnumerable<KeyValuePair<uint, int>> sorted = MyTable.OrderByDescending((data) => data.Value);
-            MySortedTable = sorted;
-            //上位10色
-            //MyData = sorted.Take(10);
-            IEnumerable<KeyValuePair<uint, int>> top = sorted.Take(128);
-            //下位10色
-            IEnumerable<KeyValuePair<uint, int>> bottom = sorted.Skip(sorted.Count() - 10);
-            //KeyValuePair<uint, int>[] neko = top.ToArray();
-            var maxValue = top.Max(x => x.Value);
-            MyData = new MyColorCountData(top, maxValue, MyBitmapPixelsCount);
+            IOrderedEnumerable<KeyValuePair<uint, int>> descend = MyTable.OrderByDescending((data) => data.Value);
+            //上位128色
+            IEnumerable<KeyValuePair<uint, int>> top = descend.Take(128);
+            var maxValue = top.Max(x => x.Value);//最大値
+            MyDataDescend = new MyColorCountData(top, maxValue, MyBitmapPixelsCount);
+            DataContext = MyDataDescend.Data;
 
-            DataContext = MyData.Data;
+
+            var ascend = MyTable.OrderBy((x) => x.Value).Take(128);
+            MyDataAscend = new MyColorCountData(ascend, ascend.Max(x => x.Value), MyBitmapPixelsCount);
         }
 
         private void MainWindow_Drop(object sender, DragEventArgs e)
@@ -98,6 +154,8 @@ namespace CountColor
                 int count = Count24bit(MyImageByte);
                 TextBlock1.Text = $"使用色数{count:#,0}(24bit)";
                 Button1.IsEnabled = true;
+                MyToggleSort.IsEnabled = false;
+                MyToggleSort.IsChecked = false;
                 MyImage.Source = MyBitmapSource;
 
                 TextBlock2.Text = "";
@@ -133,7 +191,7 @@ namespace CountColor
             {
                 if (bColor[i] == true) { count++; }
             }
-
+            
             //LINQでTrueの数をカウント、↑より1～2割遅い
             //int neko = bColor.Where(saru => saru == true).Count();
             //Whereは省略してcountメソッドだけでもカウントできるけど、もっと遅い
@@ -252,7 +310,7 @@ namespace CountColor
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            double width = ((double)values[0] - 160) * (double)values[1];
+            double width = ((double)values[0] - 120) * (double)values[1];
             return width;
         }
 
