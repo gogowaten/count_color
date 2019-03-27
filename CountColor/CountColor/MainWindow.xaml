@@ -26,7 +26,10 @@
       <TextBlock DockPanel.Dock="Top" Name="TextBlock2" Text="text2" FontSize="16" Margin="4,0"/>
       <TextBlock DockPanel.Dock="Top" Name="TextBlockPixelsCount" Margin="4,0"/>
       <StackPanel DockPanel.Dock="top" Margin="4" Orientation="Horizontal" UseLayoutRounding="True">
-        <Border DockPanel.Dock="top" Width="20" Height="auto" Background="{Binding ElementName=MyListBox, Path=SelectedItem.Brush}"/>
+        <Grid>
+          <Image Name="ImageTransparent" Width="20" Height="auto"/>
+          <Border DockPanel.Dock="top" Width="20" Height="auto" Background="{Binding ElementName=MyListBox, Path=SelectedItem.Brush}"/>
+        </Grid>
         <StackPanel>
           <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color}"/>
           <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color, Converter={StaticResource myColorToRGB}}"/>
