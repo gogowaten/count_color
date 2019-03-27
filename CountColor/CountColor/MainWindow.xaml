@@ -28,6 +28,7 @@
       <StackPanel DockPanel.Dock="top" Margin="4" Orientation="Horizontal" UseLayoutRounding="True">
         <Grid>
           <Image Name="ImageTransparent" Width="20" Height="auto"/>
+          <Border Name="BorderTransparent" Width="20" Height="auto"/>
           <Border DockPanel.Dock="top" Width="20" Height="auto" Background="{Binding ElementName=MyListBox, Path=SelectedItem.Brush}"/>
         </Grid>
         <StackPanel>

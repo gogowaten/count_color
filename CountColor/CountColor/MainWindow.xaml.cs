@@ -37,11 +37,13 @@ namespace CountColor
             this.AllowDrop = true;
             Drop += MainWindow_Drop;
             MyTable = new Dictionary<uint, int>();
+            //ImageTransparent.Source = MakeTransparentBitmap();
+            MakeTransparentBitmap();
 
             Button1.Click += Button1_Click;
             ButtonTest1.Click += ButtonTest1_Click;
             MyListBox.SelectionChanged += MyListBox_SelectionChanged;
-            MyToggleSort.Click += MyToggleSort_Click;            
+            MyToggleSort.Click += MyToggleSort_Click;
             ButtonBGColor.Click += ButtonBGColor_Click;
             ButtonImageStretch.Click += ButtonImageStretch_Click;
         }
@@ -84,7 +86,7 @@ namespace CountColor
             }
         }
 
-      
+
 
         private void MyToggleSort_Click(object sender, RoutedEventArgs e)
         {
@@ -171,11 +173,45 @@ namespace CountColor
 
         }
 
-
+        //透明市松模様画像作成20x20
         private BitmapSource MakeTransparentBitmap()
         {
-            int r = 10;
-            var wb = new WriteableBitmap(r, r, 96, 96, PixelFormats.Rgb24, null);
+            int selSize = 10;//縦横ピクセル数
+            int imgSize = selSize * 2;
+            var wb = new WriteableBitmap(imgSize, imgSize, 96, 96, PixelFormats.Rgb24, null);
+            int stride = wb.Format.BitsPerPixel / 8 * imgSize;
+            byte[] pixels = new byte[stride * imgSize];
+            wb.CopyPixels(pixels, stride, 0);
+            int p = 0;
+            Color iro;
+            for (int y = 0; y < imgSize; y++)
+            {
+                for (int x = 0; x < imgSize; x++)
+                {
+                    if ((y < 10 & x < 10) | (y > 9 & x > 9))
+                    {
+                        iro = Colors.Gray;
+                    }
+                    else
+                    {
+                        iro = Colors.White;
+                    }
+                    p = y * stride + x * 3;
+                    pixels[p] = iro.R;
+                    pixels[p + 1] = iro.G;
+                    pixels[p + 2] = iro.B;
+                }
+            }
+            wb.WritePixels(new Int32Rect(0, 0, imgSize, imgSize), pixels, stride, 0);
+//        方法: TileBrush のタイル サイズを設定する | Microsoft Docs
+//https://docs.microsoft.com/ja-jp/dotnet/framework/wpf/graphics-multimedia/how-to-set-the-tile-size-for-a-tilebrush
+
+            ImageBrush imageBrush = new ImageBrush(wb);
+            //imageBrush.Stretch = Stretch.None;
+            imageBrush.TileMode = TileMode.Tile;
+            imageBrush.ViewportUnits = BrushMappingMode.Absolute;
+            imageBrush.Viewport = new Rect(0, 0, 20, 20);
+            BorderTransparent.Background = imageBrush;
             return wb;
 
         }
@@ -198,7 +234,7 @@ namespace CountColor
             {
                 if (bColor[i] == true) { count++; }
             }
-            
+
             //LINQでTrueの数をカウント、↑より1～2割遅い
             //int neko = bColor.Where(saru => saru == true).Count();
             //Whereは省略してcountメソッドだけでもカウントできるけど、もっと遅い
