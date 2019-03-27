@@ -172,6 +172,13 @@ namespace CountColor
         }
 
 
+        private BitmapSource MakeTransparentBitmap()
+        {
+            int r = 10;
+            var wb = new WriteableBitmap(r, r, 96, 96, PixelFormats.Rgb24, null);
+            return wb;
+
+        }
 
 
         #region カウント
