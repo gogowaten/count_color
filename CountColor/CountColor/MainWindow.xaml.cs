@@ -29,6 +29,7 @@ namespace CountColor
         MyColorCountData MyDataDescend;
         MyColorCountData MyDataAscend;
         Dictionary<uint, int> MyTable;
+        //Brush MyBrushTransparent;
 
         public MainWindow()
         {
@@ -38,7 +39,7 @@ namespace CountColor
             Drop += MainWindow_Drop;
             MyTable = new Dictionary<uint, int>();
             //ImageTransparent.Source = MakeTransparentBitmap();
-            MakeTransparentBitmap();
+            BorderTransparent.Background = MakeTransparentBrush();
 
             Button1.Click += Button1_Click;
             ButtonTest1.Click += ButtonTest1_Click;
@@ -114,6 +115,8 @@ namespace CountColor
         private void ButtonTest1_Click(object sender, RoutedEventArgs e)
         {
             if (MyDataAscend is null) { return; }
+            //MyListBox.Background = MyBrushTransparent;
+            
             //var low = MyDescendSorteTable.Skip(MyDescendSorteTable.Count() - 10);
             //var max = low.Max(x => x.Value);
             //var dd = new MyColorCountData(low, max, MyBitmapPixelsCount);
@@ -174,7 +177,7 @@ namespace CountColor
         }
 
         //透明市松模様画像作成20x20
-        private BitmapSource MakeTransparentBitmap()
+        private Brush MakeTransparentBrush()
         {
             int selSize = 10;//縦横ピクセル数
             int imgSize = selSize * 2;
@@ -211,8 +214,8 @@ namespace CountColor
             imageBrush.TileMode = TileMode.Tile;
             imageBrush.ViewportUnits = BrushMappingMode.Absolute;
             imageBrush.Viewport = new Rect(0, 0, 20, 20);
-            BorderTransparent.Background = imageBrush;
-            return wb;
+            //BorderTransparent.Background = imageBrush;
+            return imageBrush;
 
         }
 
