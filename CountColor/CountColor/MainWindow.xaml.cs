@@ -39,7 +39,7 @@ namespace CountColor
             Drop += MainWindow_Drop;
             MyTable = new Dictionary<uint, int>();
             //ImageTransparent.Source = MakeTransparentBitmap();
-            BorderTransparent.Background = MakeTransparentBrush();
+            BorderTransparent.Background = MakeTileBrush(MakeCheckeredPattern(10, Colors.LightGray));// MakeTransparentBrush();
 
             Button1.Click += Button1_Click;
             ButtonTest1.Click += ButtonTest1_Click;
@@ -176,48 +176,68 @@ namespace CountColor
 
         }
 
-        //透明市松模様画像作成20x20
-        private Brush MakeTransparentBrush()
+
+
+        #region 市松模様ブラシ作成
+        //無限の透明市松模様をWriteableBitmapとImageBrushのタイル表示で作成(ソフトウェア ) - 午後わてんのブログ - Yahoo!ブログ
+        //https://blogs.yahoo.co.jp/gogowaten/15917385.html
+
+        /// <summary>
+        /// 市松模様画像作成
+        /// </summary>
+        /// <param name="cellSize">タイル1辺のサイズ</param>
+        /// <param name="gray">白じゃない方の色指定</param>
+        /// <returns></returns>
+        private WriteableBitmap MakeCheckeredPattern(int cellSize, Color gray)
         {
-            int selSize = 10;//縦横ピクセル数
-            int imgSize = selSize * 2;
-            var wb = new WriteableBitmap(imgSize, imgSize, 96, 96, PixelFormats.Rgb24, null);
-            int stride = wb.Format.BitsPerPixel / 8 * imgSize;
-            byte[] pixels = new byte[stride * imgSize];
-            wb.CopyPixels(pixels, stride, 0);
+            int width = cellSize * 2;
+            int height = cellSize * 2;
+            var wb = new WriteableBitmap(width, height, 96, 96, PixelFormats.Rgb24, null);
+            int stride = wb.Format.BitsPerPixel / 8 * width;
+            byte[] pixels = new byte[stride * height];
             int p = 0;
             Color iro;
-            for (int y = 0; y < imgSize; y++)
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < imgSize; x++)
+                for (int x = 0; x < width; x++)
                 {
-                    if ((y < 10 & x < 10) | (y > 9 & x > 9))
-                    {
-                        iro = Colors.Gray;
-                    }
-                    else
+                    if ((y < cellSize & x < cellSize) | (y >= cellSize & x >= cellSize))
                     {
                         iro = Colors.White;
                     }
+                    else { iro = gray; }
+
                     p = y * stride + x * 3;
                     pixels[p] = iro.R;
                     pixels[p + 1] = iro.G;
                     pixels[p + 2] = iro.B;
                 }
             }
-            wb.WritePixels(new Int32Rect(0, 0, imgSize, imgSize), pixels, stride, 0);
-//        方法: TileBrush のタイル サイズを設定する | Microsoft Docs
-//https://docs.microsoft.com/ja-jp/dotnet/framework/wpf/graphics-multimedia/how-to-set-the-tile-size-for-a-tilebrush
-
-            ImageBrush imageBrush = new ImageBrush(wb);
-            //imageBrush.Stretch = Stretch.None;
-            imageBrush.TileMode = TileMode.Tile;
-            imageBrush.ViewportUnits = BrushMappingMode.Absolute;
-            imageBrush.Viewport = new Rect(0, 0, 20, 20);
-            //BorderTransparent.Background = imageBrush;
-            return imageBrush;
-
+            wb.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+            return wb;
         }
+
+        //        方法: TileBrush のタイル サイズを設定する | Microsoft Docs
+        //https://docs.microsoft.com/ja-jp/dotnet/framework/wpf/graphics-multimedia/how-to-set-the-tile-size-for-a-tilebrush
+        /// <summary>
+        /// BitmapからImageBrush作成
+        /// 引き伸ばし無しでタイル状に敷き詰め
+        /// </summary>
+        /// <param name="bitmap"></param>
+        /// <returns></returns>
+        private ImageBrush MakeTileBrush(BitmapSource bitmap)
+        {
+            var imgBrush = new ImageBrush(bitmap);
+            imgBrush.Stretch = Stretch.Uniform;//これは必要ないかも
+            //タイルモード、タイル
+            imgBrush.TileMode = TileMode.Tile;
+            //タイルサイズは元画像のサイズ
+            imgBrush.Viewport = new Rect(0, 0, bitmap.Width, bitmap.Height);
+            //タイルサイズ指定方法は絶対値、これで引き伸ばされない
+            imgBrush.ViewportUnits = BrushMappingMode.Absolute;
+            return imgBrush;
+        }
+        #endregion
 
 
         #region カウント
