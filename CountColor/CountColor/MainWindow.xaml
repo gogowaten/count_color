@@ -53,7 +53,7 @@
 
       <ScrollViewer Name="MyScrollViewer" Grid.Row="0" DockPanel.Dock="Top" UseLayoutRounding="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
       </ScrollViewer>
-      <Image Name="MyImage" Stretch="Uniform"/>
+      <Image Name="MyImage" UseLayoutRounding="True"/>
     </DockPanel>
 
     <ListBox Grid.Column="1" DockPanel.Dock="Top" Name="MyListBox" ItemsSource="{Binding}">

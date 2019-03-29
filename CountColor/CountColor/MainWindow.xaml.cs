@@ -56,11 +56,13 @@ namespace CountColor
             {
                 MyDockPanel.Children.Remove(MyImage);
                 MyScrollViewer.Content = MyImage;
+                MyImage.Stretch = Stretch.None;
             }
             else
             {
                 MyScrollViewer.Content = null;
                 MyDockPanel.Children.Add(MyImage);
+                MyImage.Stretch = Stretch.Uniform;
             }
 
         }
