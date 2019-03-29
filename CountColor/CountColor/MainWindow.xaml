@@ -28,8 +28,8 @@
       <StackPanel DockPanel.Dock="top" Margin="4" Orientation="Horizontal" UseLayoutRounding="True">
         <Grid>
           <!--<Image Name="ImageTransparent" Width="20" Height="auto"/>-->
-          <Border Name="BorderTransparent" Width="20" Height="auto"/>
-          <Border DockPanel.Dock="top" Width="20" Height="auto" Background="{Binding ElementName=MyListBox, Path=SelectedItem.Brush}"/>
+          <Border Name="BorderTransparent" Width="20" Height="auto" HorizontalAlignment="Left"/>
+          <Border DockPanel.Dock="top" Width="40" Height="auto" Background="{Binding ElementName=MyListBox, Path=SelectedItem.Brush}"/>
         </Grid>
         <StackPanel>
           <TextBlock Margin="4,0" Text="{Binding ElementName=MyListBox, Path=SelectedItem.Color}"/>
@@ -57,10 +57,10 @@
     </DockPanel>
 
     <ListBox Grid.Column="1" DockPanel.Dock="Top" Name="MyListBox" ItemsSource="{Binding}">
-      <ListBox.ItemTemplate>
+      <!--<ListBox.ItemTemplate>
         <DataTemplate>
           <StackPanel Orientation="Horizontal">
-            <!--<TextBlock Text="{Binding Rate, StringFormat=000.0%}" Width="50"/>-->
+            --><!--<TextBlock Text="{Binding Rate, StringFormat=000.0%}" Width="50"/>--><!--
             <Border Background="{Binding Brush}" Width="20"/>
             <TextBlock Text="{Binding Count}" Width="50" TextAlignment="Right" Margin="0,0,4,0"/>
             <Border Background="{Binding Brush}" Height="10">
@@ -73,7 +73,7 @@
             </Border>
           </StackPanel>
         </DataTemplate>
-      </ListBox.ItemTemplate>
+      </ListBox.ItemTemplate>-->
     </ListBox>
   </Grid>
 </Window>

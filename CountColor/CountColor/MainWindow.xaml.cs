@@ -39,7 +39,7 @@ namespace CountColor
             Drop += MainWindow_Drop;
             MyTable = new Dictionary<uint, int>();
             //ImageTransparent.Source = MakeTransparentBitmap();
-            BorderTransparent.Background = MakeTileBrush(MakeCheckeredPattern(10, Colors.LightGray));// MakeTransparentBrush();
+            BorderTransparent.Background = MakeTileBrush(MakeCheckeredPattern(10, Colors.Gray));// MakeTransparentBrush();
 
             Button1.Click += Button1_Click;
             ButtonTest1.Click += ButtonTest1_Click;
@@ -47,6 +47,10 @@ namespace CountColor
             MyToggleSort.Click += MyToggleSort_Click;
             ButtonBGColor.Click += ButtonBGColor_Click;
             ButtonImageStretch.Click += ButtonImageStretch_Click;
+
+            //listbox.itemtemplate.datatemplate
+            MyListBox.ItemTemplate = CreateDataTemplateForListBox();
+
         }
 
         private void ButtonImageStretch_Click(object sender, RoutedEventArgs e)
@@ -176,6 +180,79 @@ namespace CountColor
 
             }
 
+        }
+
+
+
+        //DataTemplate作成
+        private DataTemplate CreateDataTemplateForListBox()
+        {
+            //市松模様ブラシ作成
+            ImageBrush myPattern = MakeTileBrush(MakeCheckeredPattern(8, Colors.Gray));
+
+
+            //StackPanel  RootPanel
+            //┣Grid
+            //┃ ┣Border 市松模様
+            //┃ ┗Border 色表示
+            //┣TextBlock 値表示
+            //┗Border    色表示、棒グラフ
+
+            //市松模様表示用にBorder作成
+            var eBorderPattern = new FrameworkElementFactory(typeof(Border));
+            eBorderPattern.SetValue(Border.BackgroundProperty, myPattern);//背景市松模様
+            eBorderPattern.SetValue(WidthProperty, 24.0);
+            //eBorder.SetValue(HeightProperty, 20.0);
+            //色表示用
+            var eBorderColor = new FrameworkElementFactory(typeof(Border));
+            //eBorderColor.SetBinding(Border.BackgroundProperty, new Binding("Brush"));
+            eBorderColor.SetBinding(Border.BackgroundProperty, new Binding(nameof(MyColor.Brush)));
+            eBorderColor.SetValue(WidthProperty, 24.0);
+
+            var fGrid = new FrameworkElementFactory(typeof(Grid));
+            //fGrid.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
+            fGrid.AppendChild(eBorderPattern);
+            fGrid.AppendChild(eBorderColor);
+
+
+            //値表示用にTextBlock作成
+            var eTextBlock = new FrameworkElementFactory(typeof(TextBlock));
+            //表示する値はBindingしたものにする設定
+            //eTextBlock.SetBinding(TextBlock.TextProperty, new Binding("Count"));
+            eTextBlock.SetBinding(TextBlock.TextProperty, new Binding(nameof(MyColor.Count)));
+            eTextBlock.SetValue(WidthProperty, 50.0);
+            eTextBlock.SetValue(TextBlock.TextAlignmentProperty, TextAlignment.Right);
+            eTextBlock.SetValue(TextBlock.MarginProperty, new Thickness(0, 0, 4, 0));
+            //eTextBlock.SetValue(TextBlock.BackgroundProperty, myPattern);//背景市松模様
+
+            //Border
+            var borderBarGraph = new FrameworkElementFactory(typeof(Border));
+            borderBarGraph.SetValue(HeightProperty, 10.0);
+            //borderBarGraph.SetBinding(Border.BackgroundProperty, new Binding("Brush"));
+            borderBarGraph.SetBinding(Border.BackgroundProperty, new Binding(nameof(MyColor.Brush)));
+            var bind1 = new Binding();
+            bind1.Source = MyListBox;
+            bind1.Path = new PropertyPath(ListBox.ActualWidthProperty);
+            //var bind2 = new Binding("Rate");
+            var bind2 = new Binding(nameof(MyColor.Rate));
+            var mBind = new MultiBinding();
+            mBind.Bindings.Add(bind1);
+            mBind.Bindings.Add(bind2);
+            mBind.Converter = new MyMultiConverter();
+            borderBarGraph.SetBinding(Border.WidthProperty, mBind);
+
+
+            //RootStackPanel作成、スタック方向はHorizontal
+            var rootPanel = new FrameworkElementFactory(typeof(StackPanel));
+            rootPanel.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
+            rootPanel.AppendChild(fGrid);
+            rootPanel.AppendChild(eTextBlock);
+            rootPanel.AppendChild(borderBarGraph);
+
+            //DataTemplate作成、VisualTreeに上のStackPanelを指定で完成
+            var dt = new DataTemplate(typeof(StackPanel));
+            dt.VisualTree = rootPanel;
+            return dt;
         }
 
 
