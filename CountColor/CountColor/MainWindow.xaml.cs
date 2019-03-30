@@ -250,7 +250,7 @@ namespace CountColor
             rootPanel.AppendChild(borderBarGraph);
 
             //DataTemplate作成、VisualTreeに上のStackPanelを指定で完成
-            var dt = new DataTemplate(typeof(StackPanel));
+            var dt = new DataTemplate();
             dt.VisualTree = rootPanel;
             return dt;
         }
