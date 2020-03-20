@@ -39,7 +39,8 @@ namespace CountColor
             Drop += MainWindow_Drop;
             MyTable = new Dictionary<uint, int>();
             //ImageTransparent.Source = MakeTransparentBitmap();
-            BorderTransparent.Background = MakeTileBrush(MakeCheckeredPattern(10, Colors.Gray));// MakeTransparentBrush();
+            BorderTransparent.Background = MakeTileBrush(MakeCheckeredPattern(10, Colors.LightGray));// MakeTransparentBrush();
+            MyImageGrid.Background = MakeTileBrush(MakeCheckeredPattern(10, Colors.LightGray));
 
             Button1.Click += Button1_Click;
             ButtonTest1.Click += ButtonTest1_Click;
@@ -47,7 +48,7 @@ namespace CountColor
             MyToggleSort.Click += MyToggleSort_Click;
             ButtonBGColor.Click += ButtonBGColor_Click;
             ButtonImageStretch.Click += ButtonImageStretch_Click;
-            ButtonGetClipboardImage.Click += ButtonGetClipboardImage_Click  ;
+            ButtonGetClipboardImage.Click += ButtonGetClipboardImage_Click;
 
             //listbox.itemtemplate.datatemplate
             MyListBox.ItemTemplate = CreateDataTemplateForListBox();
@@ -56,7 +57,17 @@ namespace CountColor
 
         private void ButtonGetClipboardImage_Click(object sender, RoutedEventArgs e)
         {
-            
+            var bitmap = GetBitmapFromClipboard();
+            if (bitmap == null) return;
+            MyBitmapSource = bitmap;
+            int w = bitmap.PixelWidth;
+            int h = bitmap.PixelHeight;
+            int stride = w * 32 / 8;
+            byte[] pixels = new byte[h * stride];
+            bitmap.CopyPixels(pixels, stride, 0);
+            MyImageByte = pixels;
+            //表示の初期化
+            MyInitialize();
         }
 
         private void ButtonImageStretch_Click(object sender, RoutedEventArgs e)
@@ -64,14 +75,16 @@ namespace CountColor
             if (MyImageByte is null) { return; }
             if (MyScrollViewer.Content == null)
             {
-                MyDockPanel.Children.Remove(MyImage);
+                //MyDockPanel.Children.Remove(MyImage);
+                MyImageGrid.Children.Remove(MyImage);
                 MyScrollViewer.Content = MyImage;
                 MyImage.Stretch = Stretch.None;
             }
             else
             {
                 MyScrollViewer.Content = null;
-                MyDockPanel.Children.Add(MyImage);
+                //MyDockPanel.Children.Add(MyImage);
+                MyImageGrid.Children.Add(MyImage);
                 MyImage.Stretch = Stretch.Uniform;
             }
 
@@ -128,7 +141,7 @@ namespace CountColor
         {
             if (MyDataAscend is null) { return; }
             //MyListBox.Background = MyBrushTransparent;
-            
+
             //var low = MyDescendSorteTable.Skip(MyDescendSorteTable.Count() - 10);
             //var max = low.Max(x => x.Value);
             //var dd = new MyColorCountData(low, max, MyBitmapPixelsCount);
@@ -168,23 +181,28 @@ namespace CountColor
             }
             else
             {
-                int count = Count24bit(MyImageByte);
-                TextBlock1.Text = $"使用色数{count:#,0}(24bit)";
-                Button1.IsEnabled = true;
-                MyToggleSort.IsEnabled = false;
-                MyToggleSort.IsChecked = false;
-                MyImage.Source = MyBitmapSource;
-
-                TextBlock2.Text = "";
-                DataContext = null;
-
-                int pw = MyBitmapSource.PixelWidth;
-                int ph = MyBitmapSource.PixelHeight;
-                MyBitmapPixelsCount = pw * ph;
-                TextBlockPixelsCount.Text = $"{pw} x {ph} = {MyBitmapPixelsCount:#,0} Pixels";
-
-
+                //表示の初期化
+                MyInitialize();
             }
+
+        }
+        //表示の初期化
+        private void MyInitialize()
+        {
+            int count = Count24bit(MyImageByte);
+            TextBlock1.Text = $"使用色数{count:#,0}(24bit)";
+            Button1.IsEnabled = true;
+            MyToggleSort.IsEnabled = false;
+            MyToggleSort.IsChecked = false;
+            MyImage.Source = MyBitmapSource;
+
+            TextBlock2.Text = "";
+            DataContext = null;
+
+            int pw = MyBitmapSource.PixelWidth;
+            int ph = MyBitmapSource.PixelHeight;
+            MyBitmapPixelsCount = pw * ph;
+            TextBlockPixelsCount.Text = $"{pw} x {ph} = {MyBitmapPixelsCount:#,0} Pixels";
 
         }
 
@@ -368,6 +386,100 @@ namespace CountColor
         }
 
 
+        #endregion
+
+        #region クリップボードから画像取得
+        private BitmapSource GetBitmapFromClipboard()
+        {
+            BitmapSource bitmap = null;
+            if (!Clipboard.ContainsImage()) return bitmap;
+
+            //var meta = Clipboard.GetDataObject().GetData(DataFormats.EnhancedMetafile);//これを画像で取得できればいいけどできない
+            //var metapict= Clipboard.GetDataObject().GetData(DataFormats.MetafilePicture);//セルのコピーでエラーになる
+
+            //エクセルのセル以外のコピー
+            var stream = (System.IO.MemoryStream)Clipboard.GetDataObject().GetData("PNG");
+            //var stream = (System.IO.MemoryStream)Clipboard.GetDataObject().GetData("GIF");
+            if (stream != null)
+            {
+                bitmap = BitmapFrame.Create(stream);
+                //bitmap = ToDpi96(bitmap);//dpiを96にする
+                return bitmap;
+            }
+
+            bitmap = Clipboard.GetImage();
+
+            ////エクセルのセルならBgr32に変換...は中止
+            //if (IsExcelCell())
+            //{
+            //    bitmap = new FormatConvertedBitmap(bitmap, PixelFormats.Bgr32, null, 0);
+            //    return bitmap;
+            //}
+
+            //エクセルのセルのコピーか
+            //全ピクセルのAlphaを走査して全部0なら255にする
+            int w = bitmap.PixelWidth;
+            int h = bitmap.PixelHeight;
+            int stride = w * 32 / 8;
+            byte[] pixels = new byte[h * stride];
+            bitmap.CopyPixels(pixels, stride, 0);
+            if (IsAlphaAll0(pixels) || IsExcelCell())
+            {
+                AlphaToAll255(pixels);
+                bitmap = BitmapSource.Create(w, h, 96, 96, PixelFormats.Bgra32, null, pixels, stride);
+                return bitmap;
+            }
+            return bitmap;
+        }
+
+        //未使用
+        private BitmapSource ToDpi96(BitmapSource bitmap)
+        {
+            //dpiを96にする
+            int w = bitmap.PixelWidth;
+            int h = bitmap.PixelHeight;
+            int stride = w * 32 / 8;
+            byte[] pixels = new byte[h * stride];
+            bitmap.CopyPixels(pixels, stride, 0);
+            return BitmapSource.Create(w, h, 96, 96, bitmap.Format, null, pixels, stride);
+        }
+
+
+        //alphaを255にする
+        private void AlphaToAll255(byte[] pixels)
+        {
+            for (int i = 3; i < pixels.Length; i += 4)
+            {
+                pixels[i] = 255;
+            }
+        }
+
+
+        //Alphaが全部0ならtrue、1つでも0以外があるならfalse
+        private bool IsAlphaAll0(byte[] pixels)
+        {
+            for (int i = 3; i < pixels.Length; i += 4)
+            {
+                if (pixels[i] != 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        //エクセル判定、データの中にEnhancedMetafile形式があればエクセルと判定trueを返す
+        private bool IsExcelCell()
+        {
+            string[] formats = Clipboard.GetDataObject().GetFormats();
+            foreach (var item in formats)
+            {
+                if (item == "EnhancedMetafile")
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         #endregion
 
 
