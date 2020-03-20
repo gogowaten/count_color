@@ -47,10 +47,16 @@ namespace CountColor
             MyToggleSort.Click += MyToggleSort_Click;
             ButtonBGColor.Click += ButtonBGColor_Click;
             ButtonImageStretch.Click += ButtonImageStretch_Click;
+            ButtonGetClipboardImage.Click += ButtonGetClipboardImage_Click  ;
 
             //listbox.itemtemplate.datatemplate
             MyListBox.ItemTemplate = CreateDataTemplateForListBox();
 
+        }
+
+        private void ButtonGetClipboardImage_Click(object sender, RoutedEventArgs e)
+        {
+            
         }
 
         private void ButtonImageStretch_Click(object sender, RoutedEventArgs e)

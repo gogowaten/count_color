@@ -20,8 +20,8 @@
       <RowDefinition Height="300"/>
       <RowDefinition/>
     </Grid.RowDefinitions>-->
-    <DockPanel Name="MyDockPanel" Grid.Row="0">
-      <Button DockPanel.Dock="Top" Name="Button1" Content="計算実行"/>
+    <DockPanel Name="MyDockPanel" Grid.Row="0" Margin="5">
+      <Button DockPanel.Dock="Top" Name="Button1" Content="32bitで色取得" FontSize="20"/>
       <TextBlock DockPanel.Dock="Top" Name="TextBlock1" Text="text1" FontSize="16" Margin="4,0"/>
       <TextBlock DockPanel.Dock="Top" Name="TextBlock2" Text="text2" FontSize="16" Margin="4,0"/>
       <TextBlock DockPanel.Dock="Top" Name="TextBlockPixelsCount" Margin="4,0"/>
@@ -46,9 +46,10 @@
       <StatusBar DockPanel.Dock="Top">
         <Separator/>
         <Button Name="ButtonTest1" Content="test"/>
-        <ToggleButton Name="MyToggleSort" Content="並順" IsEnabled="False"/>
-        <Button Name="ButtonBGColor" Content="背景色"/>
+        <ToggleButton Name="MyToggleSort" Content="並順" IsEnabled="False" ToolTip="昇順と降順切り替え"/>
+        <Button Name="ButtonBGColor" Content="背景色" ToolTip="背景色を変更、白→灰色→黒"/>
         <Button Name="ButtonImageStretch" Content="表示"/>
+        <Button x:Name="ButtonGetClipboardImage" Content="クリップボード" ToolTip="クリップボードから画像取得"/>
       </StatusBar>
 
       <ScrollViewer Name="MyScrollViewer" Grid.Row="0" DockPanel.Dock="Top" UseLayoutRounding="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
