@@ -29,6 +29,7 @@ namespace CountColor
         MyColorCountData MyDataDescend;
         MyColorCountData MyDataAscend;
         Dictionary<uint, int> MyTable;
+        ImageBrush MyItimatu;
         //Brush MyBrushTransparent;
 
         public MainWindow()
@@ -38,9 +39,10 @@ namespace CountColor
             this.AllowDrop = true;
             Drop += MainWindow_Drop;
             MyTable = new Dictionary<uint, int>();
-            //ImageTransparent.Source = MakeTransparentBitmap();
-            BorderTransparent.Background = MakeTileBrush(MakeCheckeredPattern(10, Colors.LightGray));// MakeTransparentBrush();
-            MyImageGrid.Background = MakeTileBrush(MakeCheckeredPattern(10, Colors.LightGray));
+            MyItimatu= MakeTileBrush(MakeCheckeredPattern(10, Colors.LightGray));
+            BorderTransparent.Background = MyItimatu;
+            MyImageGrid.Background = MyItimatu;
+            //MyScrollViewer.Background = MakeTileBrush(MakeCheckeredPattern(10, Colors.LightGray));
 
             Button1.Click += Button1_Click;
             ButtonTest1.Click += ButtonTest1_Click;
@@ -49,15 +51,41 @@ namespace CountColor
             ButtonBGColor.Click += ButtonBGColor_Click;
             ButtonImageStretch.Click += ButtonImageStretch_Click;
             ButtonGetClipboardImage.Click += ButtonGetClipboardImage_Click;
+            ButtonGetClipboardImage2.Click += ButtonGetClipboardImage2_Click;
+            ButtonItimatu.Click += ButtonItimatu_Click;
 
             //listbox.itemtemplate.datatemplate
             MyListBox.ItemTemplate = CreateDataTemplateForListBox();
 
         }
 
+        private void ButtonItimatu_Click(object sender, RoutedEventArgs e)
+        {
+            if(MyImageGrid.Background == null)
+            {
+                MyImageGrid.Background = MyItimatu;
+            }
+            else
+            {
+                MyImageGrid.Background = null;
+            }
+        }
+
+        //クリップボードから画像取得2、エクセルの図形用
+        private void ButtonGetClipboardImage2_Click(object sender, RoutedEventArgs e)
+        {
+            var bitmap = GetBitmapFromClipboard2();
+            GetClipboardImageInitialize(bitmap);
+        }
+        //クリップボードから画像取得1
         private void ButtonGetClipboardImage_Click(object sender, RoutedEventArgs e)
         {
             var bitmap = GetBitmapFromClipboard();
+            GetClipboardImageInitialize(bitmap);
+        }
+        //クリップボードから画像取得時の初期化
+        private void GetClipboardImageInitialize(BitmapSource bitmap)
+        {
             if (bitmap == null) return;
             MyBitmapSource = bitmap;
             int w = bitmap.PixelWidth;
@@ -86,6 +114,7 @@ namespace CountColor
                 //MyDockPanel.Children.Add(MyImage);
                 MyImageGrid.Children.Add(MyImage);
                 MyImage.Stretch = Stretch.Uniform;
+
             }
 
         }
@@ -394,6 +423,29 @@ namespace CountColor
             BitmapSource bitmap = null;
             if (!Clipboard.ContainsImage()) return bitmap;
 
+            bitmap = Clipboard.GetImage();
+            
+            //エクセルのデータ、もしくは全ピクセルのAlphaが全部0なら255にする
+            int w = bitmap.PixelWidth;
+            int h = bitmap.PixelHeight;
+            int stride = w * 32 / 8;
+            byte[] pixels = new byte[h * stride];
+            bitmap.CopyPixels(pixels, stride, 0);
+            if (IsAlphaAll0(pixels) || IsExcelCell())
+            {
+                ToAlpha255(pixels);
+                bitmap = BitmapSource.Create(w, h, 96, 96, PixelFormats.Bgra32, null, pixels, stride);
+                return bitmap;
+            }
+            return bitmap;
+        }
+
+        //エクセルの図形用？
+        private BitmapSource GetBitmapFromClipboard2()
+        {
+            BitmapSource bitmap = null;
+            if (!Clipboard.ContainsImage()) return bitmap;
+
             //var meta = Clipboard.GetDataObject().GetData(DataFormats.EnhancedMetafile);//これを画像で取得できればいいけどできない
             //var metapict= Clipboard.GetDataObject().GetData(DataFormats.MetafilePicture);//セルのコピーでエラーになる
 
@@ -406,31 +458,9 @@ namespace CountColor
                 //bitmap = ToDpi96(bitmap);//dpiを96にする
                 return bitmap;
             }
-
-            bitmap = Clipboard.GetImage();
-
-            ////エクセルのセルならBgr32に変換...は中止
-            //if (IsExcelCell())
-            //{
-            //    bitmap = new FormatConvertedBitmap(bitmap, PixelFormats.Bgr32, null, 0);
-            //    return bitmap;
-            //}
-
-            //エクセルのセルのコピーか
-            //全ピクセルのAlphaを走査して全部0なら255にする
-            int w = bitmap.PixelWidth;
-            int h = bitmap.PixelHeight;
-            int stride = w * 32 / 8;
-            byte[] pixels = new byte[h * stride];
-            bitmap.CopyPixels(pixels, stride, 0);
-            if (IsAlphaAll0(pixels) || IsExcelCell())
-            {
-                AlphaToAll255(pixels);
-                bitmap = BitmapSource.Create(w, h, 96, 96, PixelFormats.Bgra32, null, pixels, stride);
-                return bitmap;
-            }
             return bitmap;
         }
+
 
         //未使用
         private BitmapSource ToDpi96(BitmapSource bitmap)
@@ -446,7 +476,7 @@ namespace CountColor
 
 
         //alphaを255にする
-        private void AlphaToAll255(byte[] pixels)
+        private void ToAlpha255(byte[] pixels)
         {
             for (int i = 3; i < pixels.Length; i += 4)
             {

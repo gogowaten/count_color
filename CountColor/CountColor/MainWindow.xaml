@@ -21,7 +21,7 @@
       <RowDefinition/>
     </Grid.RowDefinitions>-->
     <DockPanel Name="MyDockPanel" Grid.Row="0" Margin="5">
-      <Button DockPanel.Dock="Top" Name="Button1" Content="32bitで色取得" FontSize="20"/>
+      <Button DockPanel.Dock="Top" Name="Button1" Content="実行" FontSize="20"/>
       <TextBlock DockPanel.Dock="Top" Name="TextBlock1" Text="text1" FontSize="16" Margin="4,0"/>
       <TextBlock DockPanel.Dock="Top" Name="TextBlock2" Text="text2" FontSize="16" Margin="4,0"/>
       <TextBlock DockPanel.Dock="Top" Name="TextBlockPixelsCount" Margin="4,0"/>
@@ -43,14 +43,23 @@
       <StackPanel DockPanel.Dock="Top">
       </StackPanel>
 
-      <StatusBar DockPanel.Dock="Top">
-        <Separator/>
+      <WrapPanel DockPanel.Dock="Top">
+        <WrapPanel.Resources>
+          <Style TargetType="Button">
+            <Setter Property="Margin" Value="2"/>
+          </Style>
+          <Style  TargetType="ToggleButton">
+            <Setter Property="Margin" Value="2"/>
+          </Style>
+        </WrapPanel.Resources>
         <Button Name="ButtonTest1" Content="test"/>
-        <ToggleButton Name="MyToggleSort" Content="並順" IsEnabled="False" ToolTip="昇順と降順切り替え"/>
-        <Button Name="ButtonBGColor" Content="背景色" ToolTip="背景色を変更、白→灰色→黒"/>
-        <Button Name="ButtonImageStretch" Content="表示"/>
-        <Button x:Name="ButtonGetClipboardImage" Content="クリップボード" ToolTip="クリップボードから画像取得"/>
-      </StatusBar>
+        <ToggleButton Name="MyToggleSort" Content="並順" IsEnabled="False" ToolTip="リストの昇順と降順切り替え"/>
+        <Button Name="ButtonBGColor" Content="背景色" ToolTip="リストの背景色を変更、白→灰色→黒"/>
+        <Button Name="ButtonImageStretch" Content="表示" ToolTip="画像の実寸表示と枠内表示の切り替え"/>
+        <Button x:Name="ButtonItimatu" Content="市松模様" ToolTip="画像の背景に市松模様表示の切り替え"/>
+        <Button x:Name="ButtonGetClipboardImage" Content="貼付1" ToolTip="クリップボードから画像取得"/>
+        <Button x:Name="ButtonGetClipboardImage2" Content="貼付2" ToolTip="クリップボードから画像取得(エクセルの図形用)"/>
+      </WrapPanel>
       <Grid x:Name="MyImageGrid" DockPanel.Dock="Top">
         <ScrollViewer Name="MyScrollViewer" Grid.Row="0" DockPanel.Dock="Top" UseLayoutRounding="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         </ScrollViewer>
